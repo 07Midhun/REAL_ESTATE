@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sell Flat</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Include the same styles as in the main page for consistency */
+        /* ... (same styles as above) ... */
+    </style>
+</head>
+<body>
+    <h1>Sell Flat</h1>
+    <form action="{{ url_for('sell_flat') }}" method="POST" enctype="multipart/form-data">
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required>
+
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" required></textarea>
+
+        <label for="price">Price:</label>
+        <input type="text" id="price" name="price" required>
+
+        <label for="location">Location:</label>
+        <input type="text" id="location" name="location" required>
+
+        <label for="number_of_bedrooms">Number of Bedrooms:</label>
+        <input type="text" id="number_of_bedrooms" name="number_of_bedrooms" required>
+
+        <label for="image">Image:</label>
+        <input type="file" id="image" name="image" accept="image/*" required>
+
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>

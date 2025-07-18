@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Listings</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #140f0f;
+            background-image: url('/static/images/bgimage.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: #fff;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+        }
+        ul {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Responsive grid */
+            gap: 10px; /* Space between items */
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            width: 100%; /* Full width */
+            max-width: 1200px; /* Limit max width */
+        }
+        li {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 5px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        li:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+        img {
+            width: 100%; /* Set the image width to 100% of its container */
+            height: auto; /* Maintain aspect ratio */
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .price {
+            font-weight: bold;
+            color: #007bff;
+        }
+        .location {
+            font-style: italic;
+            color: #666;
+        }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        form {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        input {
+            padding: 10px;
+            margin: 0 5px;
+            border-radius: 5px;
+            border: none;
+            width: 200px;
+        }
+        #contrastBox {
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.5em;
+            display: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        #contrastBox.show {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        #contrastBox.hide {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        #noResults {
+            display: none;
+            color: #ff0000;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Available Listings</h1>
+
+    <form>
+        <input type="text" id="searchInput" placeholder="Search properties...">
+    </form>
+
+    <div id="contrastBox">You searched for: <span id="userQuery"></span></div>
+    <div id="noResults">No listings found.</div>
+
+    <ul id="listingContainer">
+        {% for listing in listings %}
+            <li class="listing-item" data-image-url="{{ listing.image_url }}">
+                <img src="{{ listing.image_url }}" alt="Image of {{ listing.title }}">
+                <h3 class="title">Title: {{ listing.title }}</h3>
+                <p>{{ listing.description }}</p>
+                <p class="price">Price: {{ listing.price }}</p>
+                <p class="location">Location: {{ listing.location }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const listingContainer = document.getElementById('listingContainer');
+        const listings = document.querySelectorAll('.listing-item');
+        const contrastBox = document.getElementById('contrastBox');
+        const userQuery = document.getElementById('userQuery');
+        const noResults = document.getElementById('noResults');
+
+        function isImageSizeValid(imageUrl, minWidth, minHeight) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.src = imageUrl;
+                img.onload = () => {
+                    resolve(img.width >= minWidth && img.height >= minHeight);
+                };
+                img.onerror = () => {
+                    resolve(false);
+                };
+            });
+        }
+
+        async function filterListings() {
+            const query = searchInput.value.toLowerCase();
+            userQuery.textContent = query;
+
+            if (query) {
+                contrastBox.classList.add('show');
+            } else {
+                contrastBox.classList.remove('show');
+            }
+
+            let hasResults = false;
+
+            for (const listing of listings) {
+                const title = listing.querySelector('h3').textContent.toLowerCase();
+                const description = listing.querySelector('p').textContent.toLowerCase();
+                const price = listing.querySelector('.price').textContent.toLowerCase();
+                const location = listing.querySelector('.location').textContent.toLowerCase();
+                const imageUrl = listing.getAttribute('data-image-url');
+
+                const isValidSize = await isImageSizeValid(imageUrl, 800, 600);
+
+                if (isValidSize && (title.includes(query) || description.includes(query) || price.includes(query) || location.includes(query))) {
+                    listing.style.display = '';
+                    hasResults = true; // Set flag if there are matching results
+                } else {
+                    listing.style.display = 'none';
+                }
+            }
+
+            noResults.style.display = hasResults ? 'none' : 'block'; // Show or hide no results message
+        }
+
+        let timeout;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(timeout);
+            timeout = setTimeout(filterListings, 300);
+        });
+    </script>
+</body>
+</html>

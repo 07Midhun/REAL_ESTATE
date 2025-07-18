@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: rgb(15, 15, 15);
+            background-size: cover;
+            background-image: url('/static/images/bgimage.jpg');
+        }
+
+        h1 {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 36px;
+            text-transform: uppercase;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .profile-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #007bff;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 400px;
+            border-radius: 8px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .listing-item {
+            margin-top: 20px;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .listing-item img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .listing-item h4 {
+            margin: 0 0 5px 0;
+        }
+
+        .listing-item p {
+            margin: 0;
+        }
+
+        .property-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 50px;
+        }
+
+        .property-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .property-card img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .property-card button {
+            margin-top: 15px;
+            background-color: #0e0e0f;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .property-card button:hover {
+            background-color: #b8bbc1;
+        }
+    </style>
+</head>
+<body>
+    <h1>Home</h1>
+
+    {% if user %}
+    <div class="profile-icon" onclick="toggleModal()">
+        {{ user.username[0] }}
+    </div>
+    {% endif %}
+
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="toggleModal()">&times;</span>
+            <h2>{{ user.username }}</h2>
+            <p>Email: {{ user.email }}</p>
+            <p>Total Purchases: {{ purchases|length }}</p>
+            <p>Total Sales: {{ sales|length }}</p>
+
+            <!-- Display User Listings -->
+            <h3>Your Listings</h3>
+            {% if listings %}
+                {% for listing in listings %}
+                <div class="listing-item">
+                    <a href="{{ url_for('listing_detail', listing_id=listing.id) }}">
+                        <img src="{{ listing.image_url }}" alt="Listing Image">
+                        <h4>{{ listing.title }}</h4>
+                        <p>Price: ₹{{ listing.price }}</p>
+                        <p>Location: {{ listing.location }}</p>
+                    </a>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>No listings available.</p>
+            {% endif %}
+
+            <!-- Display User Purchases -->
+            <h3>Your Purchases</h3>
+            {% if purchases %}
+                {% for purchase in purchases %}
+                <div class="listing-item">
+                    <a href="{{ url_for('purchase_detail', purchase_id=purchase.id) }}">
+                        <img src="{{ purchase.image_url }}" alt="Purchase Image">
+                        <h4>{{ purchase.title }}</h4>
+                        <p>Price: ₹{{ purchase.price }}</p>
+                        <p>Location: {{ purchase.location }}</p>
+                    </a>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>No purchases available.</p>
+            {% endif %}
+
+            <!-- Display User Sales -->
+            <h3>Your Sales</h3>
+            {% if sales %}
+                {% for sale in sales %}
+                <div class="listing-item">
+                    <a href="{{ url_for('sale_detail', sale_id=sale.id) }}">
+                        <img src="{{ sale.image_url }}" alt="Sale Image">
+                        <h4>{{ sale.title }}</h4>
+                        <p>Price: ₹{{ sale.price }}</p>
+                        <p>Location: {{ sale.location }}</p>
+                    </a>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>No sales available.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="property-buttons">
+        <!-- Land button -->
+        <div class="property-card">
+            <img src="static/images/land.jpg" alt="Land Image">
+            <a href="{{ url_for('land') }}">
+                <button>Land</button>
+            </a>
+        </div>
+
+        <!-- House button -->
+        <div class="property-card">
+            <img src="/static/images/home.jpg" alt="House Image">
+            <a href="{{ url_for('house') }}">
+                <button>House</button>
+            </a>
+        </div>
+
+        <!-- Flat button -->
+        <div class="property-card">
+            <img src="/static/images/flat.jpg" alt="Flat Image">
+            <a href="{{ url_for('flat') }}">
+                <button>Flat</button>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Function to toggle the modal
+        function toggleModal() {
+            const modal = document.getElementById('profileModal');
+            modal.style.display = modal.style.display === 'none' || modal.style.display === '' ? 'block' : 'none';
+        }
+
+        // Close the modal when the user clicks anywhere outside of it
+        window.onclick = function(event) {
+            const modal = document.getElementById('profileModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

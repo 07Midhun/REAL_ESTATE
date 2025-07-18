@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete {{ property_type }} Listings</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f5;
+            padding: 20px;
+        }
+        .listing {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .property {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        img {
+            width: 150px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .delete-button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Delete {{ property_type }} Listings</h1>
+    <div class="listing">
+        {% for property in listings %}
+        <div class="property">
+            <img src="{{ property['image_url'] }}" alt="{{ property['title'] }}">
+            <div>
+                <h3>{{ property['title'] }}</h3>
+                <p>{{ property['description'] }}</p>
+                <p><strong>Price:</strong> ${{ property['price'] }}</p>
+                <p><strong>Location:</strong> {{ property['location'] }}</p>
+            </div>
+            <!-- Form to delete the listing -->
+            <form method="POST" action="">
+                <input type="hidden" name="listing_id" value="{{ property['_id'] }}">
+                <button class="delete-button" type="submit">Delete</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+    <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+</body>
+</html>

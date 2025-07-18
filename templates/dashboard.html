@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Dashboard</title>
+</head>
+<body>
+    <h1>Welcome, {{ user.username }}!</h1>
+    <a href="{{ url_for('sell') }}">Create a Listing</a>
+    <a href="{{ url_for('view_listings') }}">View Listings</a>
+    <a href="{{ url_for('logout') }}">Logout</a>
+
+    <h2>Your Listings:</h2>
+    <ul>
+        {% for listing in listings %}
+            <li>
+                <h3>{{ listing.title }}</h3>
+                <p>{{ listing.description }}</p>
+                <p>Price: {{ listing.price }}</p>
+                <p>Location: {{ listing.location }}</p>
+                <img src="{{ listing.image_url }}" alt="{{ listing.title }}" style="width:100px;">
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

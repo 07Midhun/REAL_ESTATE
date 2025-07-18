@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Listings</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-delete {
+            background-color: #d9534f;
+        }
+
+        .btn-delete:hover {
+            background-color: #c9302c;
+        }
+
+        .btn-edit {
+            background-color: #5bc0de;
+        }
+
+        .btn-edit:hover {
+            background-color: #31b0d5;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Manage Listings</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Listing ID</th>
+                <th>Title</th>
+                <th>Price</th>
+                <th>Location</th>
+                <th>User</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Loop through all listings in the database -->
+            {% for listing in listings %}
+            <tr>
+                <td>{{ listing._id }}</td> <!-- Ensure you're accessing the correct ID field -->
+                <td>{{ listing.title }}</td>
+                <td>₹{{ listing.price }}</td>
+                <td>{{ listing.location }}</td>
+                <td>{{ listing.username }}</td> <!-- Use the correct user field -->
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-edit" onclick="window.location.href='{{ url_for('edit_listing', listing_id=listing._id) }}'">Edit</button>
+                        <button class="btn btn-delete" onclick="confirmDelete('{{ listing._id }}')">Delete</button>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        function confirmDelete(listingId) {
+            if (confirm('Are you sure you want to delete this listing?')) {
+                window.location.href = '/admin/delete_listing/' + listingId;
+            }
+        }
+    </script>
+
+</body>
+</html>

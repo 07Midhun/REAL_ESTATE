@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ property_type }} - Buy, Sell, or Delete</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f5;
+            background-image: url('/static/images/bgimage.jpg');
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #444;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 3rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .button {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: #2980b9;
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .button:active {
+            transform: translateY(-2px);
+        }
+
+        a {
+            text-decoration: none;
+            color: #3498db;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ property_type }} Options</h1>
+    <div class="buttons">
+        <!-- Dynamically display the correct Buy and Delete buttons based on the property type -->
+        {% if property_type == 'Land' %}
+            <a href="{{ url_for('buy_land') }}">
+                <button class="button">Buy</button>
+            </a>
+            <a href="{{ url_for('delete_land') }}">
+                <button class="button">Delete</button>
+            </a>
+        {% elif property_type == 'House' %}
+            <a href="{{ url_for('buy_house') }}">
+                <button class="button">Buy</button>
+            </a>
+            <a href="{{ url_for('delete_house') }}">
+                <button class="button">Delete</button>
+            </a>
+        {% elif property_type == 'Flat' %}
+            <a href="{{ url_for('buy_flat') }}">
+                <button class="button">Buy</button>
+            </a>
+            <a href="{{ url_for('delete_flat') }}">
+                <button class="button">Delete</button>
+            </a>
+        {% endif %}
+        
+        <!-- Sell button is common to all property types -->
+        <a href="{{ url_for('sell') }}">
+            <button class="button">Sell</button>
+        </a>
+    </div>
+    <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+</body>sv
+</html>
