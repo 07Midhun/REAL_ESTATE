@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse All Properties - Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Video Background -->
+    <div class="video-background">
+        <video autoplay muted loop>
+            <source src="https://player.vimeo.com/external/434045526.sd.mp4?s=c27eecc69a27dbc4ff2b87d38afc35f1a9e7c02d&profile_id=164&oauth2_token_id=57447761" type="video/mp4">
+        </video>
+        <div class="video-overlay"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="glass">
+        <div class="container">
+            <h1 class="floating">
+                <i class="fas fa-search"></i> Browse All Properties
+            </h1>
+            <p>Admin Property Management Dashboard</p>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="navbar glass">
+        <div class="container">
+            <a href="{{ url_for('dashboard') }}" class="navbar-brand">
+                <i class="fas fa-home"></i> Real Estate
+            </a>
+            <ul class="navbar-nav">
+                <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('admin_dashboard') }}">Admin Panel</a></li>
+                <li><a href="{{ url_for('admin_browse_properties') }}">Browse Properties</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Statistics Cards -->
+        <div class="stats glass mb-4">
+            <div class="stats-grid">
+                <div class="stat-item floating">
+                    <div class="stat-number">{{ stats.total_listings }}</div>
+                    <div class="stat-label">Total Properties</div>
+                </div>
+                <div class="stat-item floating">
+                    <div class="stat-number">₹{{ "{:,.0f}".format(stats.total_value) }}</div>
+                    <div class="stat-label">Total Value</div>
+                </div>
+                <div class="stat-item floating">
+                    <div class="stat-number">₹{{ "{:,.0f}".format(stats.avg_price) }}</div>
+                    <div class="stat-label">Average Price</div>
+                </div>
+                <div class="stat-item floating">
+                    <div class="stat-number">{{ listings|length }}</div>
+                    <div class="stat-label">Filtered Results</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="card glass mb-4">
+            <div class="card-body">
+                <h3 class="card-title mb-3">
+                    <i class="fas fa-filter"></i> Filters & Search
+                </h3>
+                <form method="GET" action="{{ url_for('admin_browse_properties') }}" class="filter-form">
+                    <div class="grid grid-cols-4">
+                        <div class="form-group">
+                            <label for="property_type">Property Type</label>
+                            <select name="property_type" id="property_type" class="form-control">
+                                <option value="">All Types</option>
+                                {% for prop_type in property_types %}
+                                    <option value="{{ prop_type }}" {% if filters.property_type == prop_type %}selected{% endif %}>
+                                        {{ prop_type }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="location">Location</label>
+                            <select name="location" id="location" class="form-control">
+                                <option value="">All Locations</option>
+                                {% for loc in locations %}
+                                    <option value="{{ loc }}" {% if filters.location == loc %}selected{% endif %}>
+                                        {{ loc }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="min_price">Min Price</label>
+                            <input type="number" name="min_price" id="min_price" class="form-control" 
+                                   value="{{ filters.min_price or '' }}" placeholder="Min Price">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="max_price">Max Price</label>
+                            <input type="number" name="max_price" id="max_price" class="form-control" 
+                                   value="{{ filters.max_price or '' }}" placeholder="Max Price">
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-3 mt-3">
+                        <div class="form-group">
+                            <label for="sort_by">Sort By</label>
+                            <select name="sort_by" id="sort_by" class="form-control">
+                                <option value="created_at" {% if filters.sort_by == 'created_at' %}selected{% endif %}>Date Created</option>
+                                <option value="price" {% if filters.sort_by == 'price' %}selected{% endif %}>Price</option>
+                                <option value="title" {% if filters.sort_by == 'title' %}selected{% endif %}>Title</option>
+                                <option value="location" {% if filters.sort_by == 'location' %}selected{% endif %}>Location</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="sort_order">Order</label>
+                            <select name="sort_order" id="sort_order" class="form-control">
+                                <option value="desc" {% if filters.sort_order == 'desc' %}selected{% endif %}>Descending</option>
+                                <option value="asc" {% if filters.sort_order == 'asc' %}selected{% endif %}>Ascending</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <div class="flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i> Apply Filters
+                                </button>
+                                <a href="{{ url_for('admin_browse_properties') }}" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Clear
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Properties Grid -->
+        {% if listings %}
+            <div class="grid grid-cols-3">
+                {% for listing in listings %}
+                    <div class="card floating">
+                        <img src="{{ listing.image_url }}" alt="{{ listing.title }}" class="card-img">
+                        <div class="card-body">
+                            <h3 class="card-title">{{ listing.title }}</h3>
+                            <p class="card-text">{{ listing.description[:100] }}{% if listing.description|length > 100 %}...{% endif %}</p>
+                            <p class="card-price">₹{{ "{:,.0f}".format(listing.price) }}</p>
+                            <p class="card-location"><i class="fas fa-map-marker-alt"></i> {{ listing.location }}</p>
+                            <span class="card-type">{{ listing.property_type }}</span>
+                            
+                            <!-- Owner Information -->
+                            <div class="owner-info mt-3">
+                                <p><strong>Owner:</strong> {{ listing.username }}</p>
+                                {% if listing.contact_phone %}
+                                    <p><i class="fas fa-phone"></i> {{ listing.contact_phone }}</p>
+                                {% endif %}
+                                {% if listing.contact_email %}
+                                    <p><i class="fas fa-envelope"></i> {{ listing.contact_email }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Admin Actions -->
+                            <div class="admin-actions mt-3">
+                                <a href="{{ url_for('buy_property_payment', listing_id=listing._id) }}" class="btn btn-success btn-sm">
+                                    <i class="fas fa-shopping-cart"></i> Buy
+                                </a>
+                                <a href="{{ url_for('contact_owner', listing_id=listing._id) }}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-phone"></i> Contact
+                                </a>
+                                <a href="{{ url_for('view_user_listings', username=listing.username) }}" class="btn btn-info btn-sm">
+                                    <i class="fas fa-user"></i> View Owner
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="card glass text-center">
+                <div class="card-body">
+                    <i class="fas fa-home" style="font-size: 4rem; color: #667eea; margin-bottom: 1rem;"></i>
+                    <h3 class="card-title">No Properties Found</h3>
+                    <p class="card-text">No properties match your current filters.</p>
+                    <a href="{{ url_for('admin_browse_properties') }}" class="btn btn-primary">
+                        <i class="fas fa-refresh"></i> Clear Filters
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Action Buttons -->
+        <div class="text-center mt-5">
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary floating">
+                <i class="fas fa-arrow-left"></i> Back to Admin Dashboard
+            </a>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-primary floating">
+                <i class="fas fa-home"></i> Go to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <style>
+        .filter-form {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #2d3748;
+            backdrop-filter: blur(10px);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .owner-info {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+        }
+        
+        .owner-info p {
+            margin: 0.25rem 0;
+            color: #4a5568;
+        }
+        
+        .admin-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .admin-actions .btn {
+            flex: 1;
+            min-width: 80px;
+        }
+        
+        @media (max-width: 768px) {
+            .grid-cols-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .grid-cols-3 {
+                grid-template-columns: 1fr;
+            }
+            
+            .admin-actions {
+                flex-direction: column;
+            }
+            
+            .admin-actions .btn {
+                width: 100%;
+            }
+        }
+    </style>
+
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Add staggered animation to cards
+        const cards = document.querySelectorAll('.card');
+        cards.forEach((card, index) => {
+            card.style.animationDelay = `${index * 0.1}s`;
+        });
+
+        // Auto-submit form when filters change
+        document.querySelectorAll('.filter-form select, .filter-form input').forEach(element => {
+            element.addEventListener('change', function() {
+                // Only auto-submit for select elements, not price inputs
+                if (this.tagName === 'SELECT') {
+                    this.closest('form').submit();
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

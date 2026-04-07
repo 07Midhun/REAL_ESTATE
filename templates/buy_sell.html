@@ -2,104 +2,114 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>{{ property_type }} Options</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ property_type }} - Buy, Sell, or Delete</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f0f0f5;
+            font-family: Arial, sans-serif;
             background-image: url('/static/images/bgimage.jpg');
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            background-size: cover;
+            background-position: center;
             margin: 0;
-            color: #444;
+            padding: 20px;
+            text-align: center;
+            color: #fff;
         }
 
         h1 {
-            color: #2c3e50;
-            font-size: 3rem;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .buttons {
-            display: flex;
-            gap: 30px;
-            margin-top: 40px;
-        }
-
-        .button {
-            background-color: #3498db;
+            margin-top: 30px;
+            font-size: 36px;
             color: white;
-            padding: 15px 40px;
-            font-size: 18px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 40px;
+            margin-top: 50px;
+        }
+
+        .action-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            max-width: 200px;
+        }
+
+        .action-card img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid white;
+            transition: transform 0.3s;
+        }
+
+        .action-card img:hover {
+            transform: scale(1.05);
+        }
+
+        .action-card a button {
+            margin-top: 15px;
+            background-color: #0e0e0f;
+            color: white;
+            padding: 10px 20px;
             border: none;
-            border-radius: 50px;
+            border-radius: 5px;
             cursor: pointer;
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
-        }
-
-        .button:hover {
-            background-color: #2980b9;
-            transform: translateY(-5px);
-            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .button:active {
-            transform: translateY(-2px);
-        }
-
-        a {
-            text-decoration: none;
-            color: #3498db;
             font-size: 16px;
-            margin-top: 20px;
+            transition: background-color 0.3s;
         }
 
-        a:hover {
-            text-decoration: underline;
+        .action-card a button:hover {
+            background-color: #b8bbc1;
+            color: #000;
+        }
+
+        @media screen and (max-width: 600px) {
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .action-card {
+                margin-bottom: 30px;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>{{ property_type }} Options</h1>
-    <div class="buttons">
-        <!-- Dynamically display the correct Buy and Delete buttons based on the property type -->
-        {% if property_type == 'Land' %}
-            <a href="{{ url_for('buy_land') }}">
-                <button class="button">Buy</button>
+    <h1>{{ property_type }} Listings</h1>
+
+    <div class="action-buttons">
+        <!-- Buy Button -->
+        <div class="action-card">
+            <img src="/static/images/{{ property_type|lower }}.jpg" alt="Buy {{ property_type }}">
+            <a href="{{ url_for('buy_property', property=property_type|lower) }}">
+                <button role="button">Buy {{ property_type }}</button>
             </a>
-            <a href="{{ url_for('delete_land') }}">
-                <button class="button">Delete</button>
+        </div>
+
+        <!-- Sell Button -->
+        <div class="action-card">
+            <img src="/static/images/sell.jpg" alt="Sell {{ property_type }}">
+            <a href="{{ url_for('sell') }}">
+                <button role="button">Sell {{ property_type }}</button>
             </a>
-        {% elif property_type == 'House' %}
-            <a href="{{ url_for('buy_house') }}">
-                <button class="button">Buy</button>
+        </div>
+
+        <!-- Delete Button -->
+        <div class="action-card">
+            <img src="/static/images/delete.jpg" alt="Delete {{ property_type }}">
+            <a href="{{ url_for('delete_property', property=property_type|lower) }}">
+                <button role="button">Delete {{ property_type }}</button>
             </a>
-            <a href="{{ url_for('delete_house') }}">
-                <button class="button">Delete</button>
-            </a>
-        {% elif property_type == 'Flat' %}
-            <a href="{{ url_for('buy_flat') }}">
-                <button class="button">Buy</button>
-            </a>
-            <a href="{{ url_for('delete_flat') }}">
-                <button class="button">Delete</button>
-            </a>
-        {% endif %}
-        
-        <!-- Sell button is common to all property types -->
-        <a href="{{ url_for('sell') }}">
-            <button class="button">Sell</button>
-        </a>
+        </div>
     </div>
-    <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
-</body>sv
+</body>
 </html>

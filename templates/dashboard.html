@@ -3,22 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <title>User Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #e0eafc, #cfdef3);
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #003366;
+            margin-bottom: 10px;
+        }
+
+        a {
+            display: inline-block;
+            margin: 10px;
+            padding: 10px 20px;
+            text-decoration: none;
+            color: white;
+            background-color: #0077b6;
+            border-radius: 6px;
+            transition: background 0.3s;
+        }
+
+        a:hover {
+            background-color: #023e8a;
+        }
+
+        h2 {
+            margin-top: 30px;
+            color: #002744;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #ffffffdd;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            padding: 20px;
+            transition: transform 0.2s;
+        }
+
+        li:hover {
+            transform: translateY(-5px);
+        }
+
+        li h3 {
+            margin-top: 0;
+            color: #1d3557;
+        }
+
+        li p {
+            margin: 5px 0;
+        }
+    </style>
 </head>
 <body>
     <h1>Welcome, {{ user.username }}!</h1>
-    <a href="{{ url_for('sell') }}">Create a Listing</a>
-    <a href="{{ url_for('view_listings') }}">View Listings</a>
-    <a href="{{ url_for('logout') }}">Logout</a>
+   
 
+
+    <div style="text-align: center;">
+        <a href="{{ url_for('sell') }}">Create a Listing</a>
+        <a href="{{ url_for('view_listings') }}">View Listings</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+     {% if user.is_admin %}
+    <a href="{{ url_for('admin_dashboard') }}" style="padding: 10px 20px; background-color: #0077b6; color: white; border-radius: 5px; text-decoration: none;">
+        Go to Admin Dashboard
+    </a>
+    {% endif %}
     <h2>Your Listings:</h2>
     <ul>
         {% for listing in listings %}
             <li>
                 <h3>{{ listing.title }}</h3>
                 <p>{{ listing.description }}</p>
-                <p>Price: {{ listing.price }}</p>
-                <p>Location: {{ listing.location }}</p>
-                <img src="{{ listing.image_url }}" alt="{{ listing.title }}" style="width:100px;">
+                <p><strong>Price:</strong> ₹{{ listing.price }}</p>
+                <p><strong>Location:</strong> {{ listing.location }}</p>
             </li>
         {% endfor %}
     </ul>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buy Property - {{ listing.title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .payment-option {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .payment-option:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+        }
+        
+        .payment-option.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        .payment-option i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .qr-code {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            margin: 1rem 0;
+        }
+        
+        .qr-code img {
+            max-width: 200px;
+            height: auto;
+        }
+        
+        .payment-details {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        
+        .price-breakdown {
+            border-top: 1px solid #e2e8f0;
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Video Background -->
+    <div class="video-background">
+        <video autoplay muted loop>
+            <source src="https://player.vimeo.com/external/434045526.sd.mp4?s=c27eecc69a27dbc4ff2b87d38afc35f1a9e7c02d&profile_id=164&oauth2_token_id=57447761" type="video/mp4">
+        </video>
+        <div class="video-overlay"></div>
+    </div>
+
+    <div class="container">
+        <div class="form-container glass">
+            <h1 class="text-center mb-4 floating">
+                <i class="fas fa-shopping-cart"></i> Purchase Property
+            </h1>
+            
+            <!-- Property Details -->
+            <div class="card mb-4 glass">
+                <img src="{{ listing.image_url }}" alt="{{ listing.title }}" class="card-img">
+                <div class="card-body">
+                    <h2 class="card-title">{{ listing.title }}</h2>
+                    <p class="card-text">{{ listing.description }}</p>
+                    <p class="card-price">₹{{ "{:,.0f}".format(listing.price) }}</p>
+                    <p class="card-location"><i class="fas fa-map-marker-alt"></i> {{ listing.location }}</p>
+                    <span class="card-type">{{ listing.property_type }}</span>
+                </div>
+            </div>
+
+            <!-- Payment Details -->
+            <div class="payment-details">
+                <h3 class="mb-3">
+                    <i class="fas fa-credit-card"></i> Payment Details
+                </h3>
+                
+                <div class="price-breakdown">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Property Price:</span>
+                        <span>₹{{ "{:,.0f}".format(listing.price) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Processing Fee:</span>
+                        <span>₹{{ "{:,.0f}".format(listing.price * 0.02) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>GST (18%):</span>
+                        <span>₹{{ "{:,.0f}".format(listing.price * 0.18) }}</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between font-weight-bold">
+                        <span>Total Amount:</span>
+                        <span class="card-price">₹{{ "{:,.0f}".format(listing.price * 1.20) }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Methods -->
+            <h3 class="mb-3">
+                <i class="fas fa-mobile-alt"></i> Choose Payment Method
+            </h3>
+            
+            <div class="payment-methods">
+                <div class="payment-option" onclick="selectPayment('gpay')">
+                    <i class="fas fa-mobile-alt" style="color: #00D4AA;"></i>
+                    <h4>Google Pay</h4>
+                    <p>Scan QR Code</p>
+                </div>
+                
+                <div class="payment-option" onclick="selectPayment('phonepe')">
+                    <i class="fas fa-mobile-alt" style="color: #5F259F;"></i>
+                    <h4>PhonePe</h4>
+                    <p>Scan QR Code</p>
+                </div>
+                
+                <div class="payment-option" onclick="selectPayment('paytm')">
+                    <i class="fas fa-mobile-alt" style="color: #00BAF2;"></i>
+                    <h4>Paytm</h4>
+                    <p>Scan QR Code</p>
+                </div>
+                
+                <div class="payment-option" onclick="selectPayment('card')">
+                    <i class="fas fa-credit-card" style="color: #667eea;"></i>
+                    <h4>Credit/Debit Card</h4>
+                    <p>Secure Payment</p>
+                </div>
+                
+                <div class="payment-option" onclick="selectPayment('netbanking')">
+                    <i class="fas fa-university" style="color: #48bb78;"></i>
+                    <h4>Net Banking</h4>
+                    <p>Direct Transfer</p>
+                </div>
+                
+                <div class="payment-option" onclick="selectPayment('upi')">
+                    <i class="fas fa-mobile-alt" style="color: #FF6B35;"></i>
+                    <h4>UPI</h4>
+                    <p>Instant Transfer</p>
+                </div>
+            </div>
+
+            <!-- QR Code Section -->
+            <div id="qr-section" style="display: none;">
+                <h3 class="mb-3">
+                    <i class="fas fa-qrcode"></i> Scan QR Code
+                </h3>
+                <div class="qr-code">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=realestate@paytm&pn=Real%20Estate%20Payment&am={{ listing.price * 1.20 }}&tn=Property%20Purchase%20-%20{{ listing.title }}" alt="Payment QR Code">
+                    <p class="mt-2">Scan this QR code with your payment app</p>
+                    <p><strong>Amount:</strong> ₹{{ "{:,.0f}".format(listing.price * 1.20) }}</p>
+                </div>
+            </div>
+
+            <!-- Payment Form -->
+            <form id="payment-form" action="{{ url_for('process_payment', listing_id=listing._id) }}" method="POST" style="display: none;">
+                <input type="hidden" name="payment_method" id="selected_payment">
+                <input type="hidden" name="amount" value="{{ listing.price * 1.20 }}">
+                
+                <div class="form-group">
+                    <label for="card_number" class="form-label">
+                        <i class="fas fa-credit-card"></i> Card Number
+                    </label>
+                    <input type="text" id="card_number" name="card_number" class="form-control" placeholder="1234 5678 9012 3456">
+                </div>
+                
+                <div class="grid grid-cols-2">
+                    <div class="form-group">
+                        <label for="expiry" class="form-label">Expiry Date</label>
+                        <input type="text" id="expiry" name="expiry" class="form-control" placeholder="MM/YY">
+                    </div>
+                    <div class="form-group">
+                        <label for="cvv" class="form-label">CVV</label>
+                        <input type="text" id="cvv" name="cvv" class="form-control" placeholder="123">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="card_name" class="form-label">Cardholder Name</label>
+                    <input type="text" id="card_name" name="card_name" class="form-control" placeholder="John Doe">
+                </div>
+                
+                <button type="submit" class="btn btn-primary floating" style="width: 100%;">
+                    <i class="fas fa-lock"></i> Pay Securely ₹{{ "{:,.0f}".format(listing.price * 1.20) }}
+                </button>
+            </form>
+
+            <!-- Action Buttons -->
+            <div class="text-center mt-4">
+                <button id="proceed-btn" class="btn btn-success floating" style="display: none;" onclick="proceedToPayment()">
+                    <i class="fas fa-arrow-right"></i> Proceed to Payment
+                </button>
+                <a href="{{ url_for('buy_property', property=listing.property_type.lower()) }}" class="btn btn-secondary floating">
+                    <i class="fas fa-arrow-left"></i> Back to Listings
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedPaymentMethod = '';
+        
+        function selectPayment(method) {
+            // Remove previous selections
+            document.querySelectorAll('.payment-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Add selection to clicked option
+            event.currentTarget.classList.add('selected');
+            selectedPaymentMethod = method;
+            
+            // Show proceed button
+            document.getElementById('proceed-btn').style.display = 'inline-block';
+            
+            // Hide QR and form initially
+            document.getElementById('qr-section').style.display = 'none';
+            document.getElementById('payment-form').style.display = 'none';
+        }
+        
+        function proceedToPayment() {
+            if (selectedPaymentMethod === 'card' || selectedPaymentMethod === 'netbanking') {
+                // Show payment form
+                document.getElementById('payment-form').style.display = 'block';
+                document.getElementById('qr-section').style.display = 'none';
+                document.getElementById('selected_payment').value = selectedPaymentMethod;
+            } else {
+                // Show QR code for mobile payments
+                document.getElementById('qr-section').style.display = 'block';
+                document.getElementById('payment-form').style.display = 'none';
+                
+                // Update QR code based on payment method
+                const qrImage = document.querySelector('.qr-code img');
+                const amount = '{{ listing.price * 1.20 }}';
+                let upiId = '';
+                
+                switch(selectedPaymentMethod) {
+                    case 'gpay':
+                        upiId = 'realestate@okicici';
+                        break;
+                    case 'phonepe':
+                        upiId = 'realestate@ybl';
+                        break;
+                    case 'paytm':
+                        upiId = 'realestate@paytm';
+                        break;
+                    case 'upi':
+                        upiId = 'realestate@upi';
+                        break;
+                }
+                
+                qrImage.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=' + upiId + '&pn=Real%20Estate%20Payment&am=' + amount + '&tn=Property%20Purchase%20-%20{{ listing.title }}';
+            }
+        }
+        
+        // Add some CSS utility classes
+        document.head.insertAdjacentHTML('beforeend', `
+            <style>
+                .d-flex { display: flex; }
+                .justify-content-between { justify-content: space-between; }
+                .mb-2 { margin-bottom: 0.5rem; }
+                .font-weight-bold { font-weight: bold; }
+                .text-muted { color: #6c757d; }
+                hr { border: none; border-top: 1px solid #e2e8f0; margin: 1rem 0; }
+            </style>
+        `);
+    </script>
+</body>
+</html> 

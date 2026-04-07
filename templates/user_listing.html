@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ user.username }}'s Listings</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        h2 {
+            text-align: center;
+        }
+        .listing {
+            background: white;
+            padding: 15px;
+            margin: 15px auto;
+            border-radius: 8px;
+            max-width: 600px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        img {
+            max-width: 100%;
+            border-radius: 6px;
+        }
+        .back {
+            display: block;
+            margin: 20px auto;
+            text-align: center;
+            text-decoration: none;
+            color: white;
+            background: #0077b6;
+            padding: 10px 20px;
+            border-radius: 5px;
+            width: max-content;
+        }
+    </style>
+</head>
+<body>
+    <h2>Listings by {{ user.username }}</h2>
+
+    {% if listings %}
+        {% for listing in listings %}
+            <div class="listing">
+                <img src="{{ listing.image_url }}" alt="Image">
+                <h3>{{ listing.title }}</h3>
+                <p><strong>Price:</strong> ₹{{ listing.price }}</p>
+                <p><strong>Location:</strong> {{ listing.location }}</p>
+                <p><strong>Description:</strong> {{ listing.description }}</p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No listings found for this user.</p>
+    {% endif %}
+
+    <a class="back" href="{{ url_for('admin_dashboard') }}">← Back to Admin Dashboard</a>
+</body>
+</html>

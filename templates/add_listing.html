@@ -3,103 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Listing</title>
-    <link rel="stylesheet" href="/static/style.css">
-    <style>
-        /* General Page Styles */
-        body {
-            font-family: 'Arial', sans-serif;
-            background-image: url('/static/images/bgimage.jpg'); /* Path to your background image */
-            background-size: cover; /* Make the background cover the whole page */
-            background-position: center; /* Center the background image */
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100vh; /* Full height */
-            color: #fff; /* Text color for contrast */
-        }
+    <title>Add Listing - Real Estate</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Video Background -->
+    <div class="video-background">
+        <video autoplay muted loop>
+            <source src="https://player.vimeo.com/external/434045526.sd.mp4?s=c27eecc69a27dbc4ff2b87d38afc35f1a9e7c02d&profile_id=164&oauth2_token_id=57447761" type="video/mp4">
+        </video>
+        <div class="video-overlay"></div>
+    </div>
 
-        h1 {
-            color: #0a0606;
-            font-size: 32px;
-            margin-top: 30px;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            text-align: center;
-        }
+    <div class="container">
+        <div class="form-container glass">
+            <h1 class="text-center mb-4 floating">Add New Listing</h1>
+            
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="flash flash-error">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <form action="{{ url_for('sell') }}" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="title" class="form-label">
+                        <i class="fas fa-home"></i> Property Title
+                    </label>
+                    <input type="text" id="title" name="title" class="form-control" required>
+                </div>
 
-        form {
-            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            width: 100%;
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
+                <div class="form-group">
+                    <label for="description" class="form-label">
+                        <i class="fas fa-align-left"></i> Description
+                    </label>
+                    <textarea id="description" name="description" class="form-control" required></textarea>
+                </div>
 
-        label {
-            font-size: 16px;
-            color: #333;
-            margin-bottom: 8px;
-        }
+                <div class="form-group">
+                    <label for="price" class="form-label">
+                        <i class="fas fa-rupee-sign"></i> Price (₹)
+                    </label>
+                    <input type="number" id="price" name="price" class="form-control" required>
+                </div>
 
-        input[type="text"],
-        textarea,
-        select,
-        input[type="file"] {
-            width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            transition: border 0.3s ease;
-        }
+                <div class="form-group">
+                    <label for="location" class="form-label">
+                        <i class="fas fa-map-marker-alt"></i> Location
+                    </label>
+                    <input type="text" id="location" name="location" class="form-control" required>
+                </div>
 
-        input[type="text"]:focus,
-        textarea:focus,
-        select:focus,
-        input[type="file"]:focus {
-            border-color: #d84a58;
-        }
+                <div class="form-group">
+                    <label for="property_type" class="form-label">
+                        <i class="fas fa-building"></i> Property Type
+                    </label>
+                    <select id="property_type" name="property_type" class="form-control" required onchange="toggleFields()">
+                        <option value="">Select Property Type</option>
+                        <option value="Land">Land</option>
+                        <option value="House">House</option>
+                        <option value="Flat">Flat</option>
+                    </select>
+                </div>
 
-        textarea {
-            resize: vertical;
-            height: 120px;
-        }
+                <!-- Contact Information Section -->
+                <div class="form-group">
+                    <h3 class="mb-3 floating">
+                        <i class="fas fa-address-book"></i> Contact Information
+                    </h3>
+                    <label for="contact_phone" class="form-label">
+                        <i class="fas fa-phone"></i> Contact Phone
+                    </label>
+                    <input type="tel" id="contact_phone" name="contact_phone" class="form-control" placeholder="+91 98765 43210">
+                </div>
 
-        button {
-            background-color: #d84a58;
-            color: white;
-            padding: 15px;
-            font-size: 18px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
+                <div class="form-group">
+                    <label for="contact_email" class="form-label">
+                        <i class="fas fa-envelope"></i> Contact Email
+                    </label>
+                    <input type="email" id="contact_email" name="contact_email" class="form-control" placeholder="your@email.com">
+                </div>
 
-        button:hover {
-            background-color: #c6394a;
-        }
+                <div class="form-group">
+                    <label for="contact_address" class="form-label">
+                        <i class="fas fa-map-marker-alt"></i> Contact Address
+                    </label>
+                    <textarea id="contact_address" name="contact_address" class="form-control" placeholder="Enter contact address"></textarea>
+                </div>
 
-        /* Responsive Design for Smaller Screens */
-        @media (max-width: 768px) {
-            form {
-                max-width: 100%;
-                padding: 20px;
-            }
+                <!-- Property-specific fields -->
+                <div id="land_fields" style="display: none;">
+                    <div class="form-group">
+                        <label for="acres" class="form-label">
+                            <i class="fas fa-ruler-combined"></i> Acres
+                        </label>
+                        <input type="text" id="acres" name="acres" class="form-control">
+                    </div>
 
-            h1 {
-                font-size: 28px;
-            }
-        }
-    </style>
+                    <div class="form-group">
+                        <label for="facing" class="form-label">
+                            <i class="fas fa-compass"></i> Facing Direction
+                        </label>
+                        <input type="text" id="facing" name="facing" class="form-control" placeholder="North, South, East, West">
+                    </div>
+                </div>
+
+                <div id="house_fields" style="display: none;">
+                    <div class="form-group">
+                        <label for="bhk" class="form-label">
+                            <i class="fas fa-bed"></i> BHK
+                        </label>
+                        <select id="bhk" name="bhk" class="form-control">
+                            <option value="1 BHK">1 BHK</option>
+                            <option value="2 BHK">2 BHK</option>
+                            <option value="3 BHK">3 BHK</option>
+                            <option value="4 BHK">4 BHK</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="flat_fields" style="display: none;">
+                    <div class="form-group">
+                        <label for="bhk_flat" class="form-label">
+                            <i class="fas fa-bed"></i> BHK
+                        </label>
+                        <select id="bhk_flat" name="bhk_flat" class="form-control">
+                            <option value="1 BHK">1 BHK</option>
+                            <option value="2 BHK">2 BHK</option>
+                            <option value="3 BHK">3 BHK</option>
+                            <option value="4 BHK">4 BHK</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="image" class="form-label">
+                        <i class="fas fa-image"></i> Property Image
+                    </label>
+                    <input type="file" id="image" name="image" class="form-control" accept="image/*" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary floating" style="width: 100%;">
+                    <i class="fas fa-plus-circle"></i> Add Listing
+                </button>
+            </form>
+            
+            <div class="text-center mt-3">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-secondary floating">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
     <script>
         function toggleFields() {
             const propertyType = document.getElementById('property_type').value;
@@ -122,65 +182,5 @@
             }
         }
     </script>
-</head>
-<body>
-    <h1>Add Listing</h1>
-    <form action="{{ url_for('sell') }}" method="POST" enctype="multipart/form-data">
-        <label for="title">Title:</label>
-        <input type="text" id="title" name="title" required>
-
-        <label for="description">Description:</label>
-        <textarea id="description" name="description" required></textarea>
-
-        <label for="price">Price:</label>
-        <input type="text" id="price" name="price" required>
-
-        <label for="location">Location:</label>
-        <input type="text" id="location" name="location" required>
-
-        <label for="property_type">Property Type:</label>
-        <select id="property_type" name="property_type" required onchange="toggleFields()">
-            <option value="">Select Property Type</option>
-            <option value="Land">Land</option>
-            <option value="House">House</option>
-            <option value="Flat">Flat</option>
-        </select>
-
-        <!-- Land-specific fields -->
-        <div id="land_fields" style="display: none;">
-            <label for="acres">Acres:</label>
-            <input type="text" id="acres" name="acres">
-
-            <label for="facing">Facing:</label>
-            <input type="text" id="facing" name="facing">
-        </div>
-
-        <!-- House-specific fields -->
-        <div id="house_fields" style="display: none;">
-            <label for="bhk">BHK Required:</label>
-            <select id="bhk" name="bhk">
-                <option value="1 BHK">1 BHK</option>
-                <option value="2 BHK">2 BHK</option>
-                <option value="3 BHK">3 BHK</option>
-                <option value="4 BHK">4 BHK</option>
-            </select>
-        </div>
-
-        <!-- Flat-specific fields -->
-        <div id="flat_fields" style="display: none;">
-            <label for="bhk_flat">BHK Required:</label>
-            <select id="bhk_flat" name="bhk_flat">
-                <option value="1 BHK">1 BHK</option>
-                <option value="2 BHK">2 BHK</option>
-                <option value="3 BHK">3 BHK</option>
-                <option value="4 BHK">4 BHK</option>
-            </select>
-        </div>
-
-        <label for="image">Image:</label>
-        <input type="file" id="image" name="image" accept="image/*" required>
-
-        <button type="submit">Submit</button>
-    </form>
 </body>
 </html>

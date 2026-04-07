@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Owner - {{ listing.title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Video Background -->
+    <div class="video-background">
+        <video autoplay muted loop>
+            <source src="https://player.vimeo.com/external/434045526.sd.mp4?s=c27eecc69a27dbc4ff2b87d38afc35f1a9e7c02d&profile_id=164&oauth2_token_id=57447761" type="video/mp4">
+        </video>
+        <div class="video-overlay"></div>
+    </div>
+
+    <div class="container">
+        <div class="form-container glass">
+            <h1 class="text-center mb-4 floating">Contact Property Owner</h1>
+            
+            <div class="card mb-4 glass">
+                <img src="{{ listing.image_url }}" alt="{{ listing.title }}" class="card-img">
+                <div class="card-body">
+                    <h2 class="card-title">{{ listing.title }}</h2>
+                    <p class="card-text">{{ listing.description }}</p>
+                    <p class="card-price">₹{{ "{:,.0f}".format(listing.price) }}</p>
+                    <p class="card-location"><i class="fas fa-map-marker-alt"></i> {{ listing.location }}</p>
+                    <span class="card-type">{{ listing.property_type }}</span>
+                </div>
+            </div>
+
+            <div class="contact-info glass">
+                <h3 class="mb-3 floating">
+                    <i class="fas fa-address-book"></i> Owner Contact Information
+                </h3>
+                
+                {% if listing.contact_phone %}
+                    <div class="contact-item floating">
+                        <i class="fas fa-phone"></i>
+                        <div>
+                            <strong>Phone:</strong>
+                            <a href="tel:{{ listing.contact_phone }}" class="btn btn-primary btn-sm">
+                                {{ listing.contact_phone }}
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                {% if listing.contact_email %}
+                    <div class="contact-item floating">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <strong>Email:</strong>
+                            <a href="mailto:{{ listing.contact_email }}" class="btn btn-primary btn-sm">
+                                {{ listing.contact_email }}
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                {% if listing.contact_address %}
+                    <div class="contact-item floating">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <strong>Address:</strong>
+                            <p>{{ listing.contact_address }}</p>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                {% if not listing.contact_phone and not listing.contact_email and not listing.contact_address %}
+                    <div class="flash flash-error floating">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        No contact information available for this property.
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="{{ url_for('buy_property', property=listing.property_type.lower()) }}" class="btn btn-secondary floating">
+                    <i class="fas fa-arrow-left"></i> Back to Listings
+                </a>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-primary floating">
+                    <i class="fas fa-home"></i> Go to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

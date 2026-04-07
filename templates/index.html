@@ -3,249 +3,224 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="style.css">
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: rgb(15, 15, 15);
-            background-size: cover;
-            background-image: url('/static/images/bgimage.jpg');
-        }
-
-        h1 {
-            margin-top: 30px;
-            text-align: center;
-            font-size: 36px;
-            text-transform: uppercase;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
-        }
-
-        .profile-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background-color: #007bff;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            cursor: pointer;
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4);
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 400px;
-            border-radius: 8px;
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .listing-item {
-            margin-top: 20px;
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .listing-item img {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 8px;
-        }
-
-        .listing-item h4 {
-            margin: 0 0 5px 0;
-        }
-
-        .listing-item p {
-            margin: 0;
-        }
-
-        .property-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin-top: 50px;
-        }
-
-        .property-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .property-card img {
-            width: 150px;
-            height: 150px;
-            object-fit: cover;
-            border-radius: 8px;
-        }
-
-        .property-card button {
-            margin-top: 15px;
-            background-color: #0e0e0f;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        .property-card button:hover {
-            background-color: #b8bbc1;
-        }
-    </style>
+    <title>Dashboard - Real Estate</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <h1>Home</h1>
-
-    {% if user %}
-    <div class="profile-icon" onclick="toggleModal()">
-        {{ user.username[0] }}
+    <!-- Video Background -->
+    <div class="video-background">
+        <video autoplay muted loop>
+            <source src="https://player.vimeo.com/external/434045526.sd.mp4?s=c27eecc69a27dbc4ff2b87d38afc35f1a9e7c02d&profile_id=164&oauth2_token_id=57447761" type="video/mp4">
+        </video>
+        <div class="video-overlay"></div>
     </div>
-    {% endif %}
 
-    <div id="profileModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="toggleModal()">&times;</span>
-            <h2>{{ user.username }}</h2>
-            <p>Email: {{ user.email }}</p>
-            <p>Total Purchases: {{ purchases|length }}</p>
-            <p>Total Sales: {{ sales|length }}</p>
+    <!-- Header -->
+    <header class="glass">
+        <div class="container">
+            <h1>Welcome, {{ user.username }} {% if user.is_admin %}<i class="fas fa-crown" style="color: gold;"></i>{% endif %}</h1>
+            <p>Your Real Estate Dashboard</p>
+        </div>
+    </header>
 
-            <!-- Display User Listings -->
-            <h3>Your Listings</h3>
+    <!-- Navigation -->
+    <nav class="navbar glass">
+        <div class="container">
+            <a href="{{ url_for('dashboard') }}" class="navbar-brand">
+                <i class="fas fa-home"></i> Real Estate
+            </a>
+            <ul class="navbar-nav">
+                <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('sell') }}">Add Listing</a></li>
+                <li><a href="{{ url_for('edit_profile') }}">Edit Profile</a></li>
+                {% if user.is_admin %}
+                    <li><a href="{{ url_for('admin_dashboard') }}">Admin Panel</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero animated-bg">
+            <div class="container">
+                <h1 class="floating">Find Your Dream Property</h1>
+                <p>Discover the perfect home, land, or investment opportunity</p>
+                <div class="hero-buttons">
+                    <a href="{{ url_for('sell') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-plus"></i> List Your Property
+                    </a>
+                    <a href="#browse" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-search"></i> Browse Properties
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="stats glass">
+            <div class="stats-grid">
+                <div class="stat-item floating">
+                    <div class="stat-number">{{ total }}</div>
+                    <div class="stat-label">Total Properties</div>
+                </div>
+                <div class="stat-item floating">
+                    <div class="stat-number">{{ land_count }}</div>
+                    <div class="stat-label">Land</div>
+                </div>
+                <div class="stat-item floating">
+                    <div class="stat-number">{{ house_count }}</div>
+                    <div class="stat-label">Houses</div>
+                </div>
+                <div class="stat-item floating">
+                    <div class="stat-number">{{ flat_count }}</div>
+                    <div class="stat-label">Flats</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Profile Section -->
+        <div class="card mb-4 glass">
+            <div class="card-body">
+                <div class="grid grid-cols-2">
+                    <div>
+                        <h3><i class="fas fa-user"></i> Profile Information</h3>
+                        <p><strong>Username:</strong> {{ user.username }}</p>
+                        <p><strong>Email:</strong> {{ user.email }}</p>
+                        {% if user.phone %}
+                            <p><strong>Phone:</strong> {{ user.phone }}</p>
+                        {% endif %}
+                        {% if user.address %}
+                            <p><strong>Address:</strong> {{ user.address }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="text-center">
+                        <div class="floating" style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto;">
+                            {{ user.username[0]|upper }}
+                        </div>
+                        <p class="mt-2">{{ user.username }}</p>
+                        {% if user.is_admin %}
+                            <span class="card-type">Administrator</span>
+                        {% else %}
+                            <span class="card-type">User</span>
+                        {% endif %}
+                        <div class="mt-3">
+                            <a href="{{ url_for('edit_profile') }}" class="btn btn-primary btn-sm floating">
+                                <i class="fas fa-edit"></i> Edit Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Property Categories -->
+        {% if not user.is_admin %}
+            <h2 class="text-center mb-4" id="browse">Browse Properties</h2>
+            <div class="grid grid-cols-3">
+                <!-- Land -->
+                <div class="card floating">
+                    <img src="/static/images/land.jpg" alt="Land" class="card-img">
+                    <div class="card-body text-center">
+                        <h3 class="card-title">Land</h3>
+                        <p class="card-text">Find the perfect plot for your dream home</p>
+                        <a href="{{ url_for('buy_property', property='land') }}" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Browse Land
+                        </a>
+                    </div>
+                </div>
+
+                <!-- House -->
+                <div class="card floating">
+                    <img src="/static/images/home.jpg" alt="House" class="card-img">
+                    <div class="card-body text-center">
+                        <h3 class="card-title">Houses</h3>
+                        <p class="card-text">Discover beautiful houses for sale</p>
+                        <a href="{{ url_for('buy_property', property='house') }}" class="btn btn-primary">
+                            <i class="fas fa-home"></i> Browse Houses
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Flat -->
+                <div class="card floating">
+                    <img src="/static/images/flat.jpg" alt="Flat" class="card-img">
+                    <div class="card-body text-center">
+                        <h3 class="card-title">Flats</h3>
+                        <p class="card-text">Modern apartments and flats available</p>
+                        <a href="{{ url_for('buy_property', property='flat') }}" class="btn btn-primary">
+                            <i class="fas fa-building"></i> Browse Flats
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User's Listings -->
             {% if listings %}
-                {% for listing in listings %}
-                <div class="listing-item">
-                    <a href="{{ url_for('listing_detail', listing_id=listing.id) }}">
-                        <img src="{{ listing.image_url }}" alt="Listing Image">
-                        <h4>{{ listing.title }}</h4>
-                        <p>Price: ₹{{ listing.price }}</p>
-                        <p>Location: {{ listing.location }}</p>
-                    </a>
+                <h2 class="text-center mb-4 mt-5">Your Listings</h2>
+                <div class="grid grid-cols-3">
+                    {% for listing in listings %}
+                        <div class="card floating">
+                            <img src="{{ listing.image_url }}" alt="{{ listing.title }}" class="card-img">
+                            <div class="card-body">
+                                <h3 class="card-title">{{ listing.title }}</h3>
+                                <p class="card-text">{{ listing.description[:100] }}{% if listing.description|length > 100 %}...{% endif %}</p>
+                                <p class="card-price">₹{{ "{:,.0f}".format(listing.price) }}</p>
+                                <p class="card-location"><i class="fas fa-map-marker-alt"></i> {{ listing.location }}</p>
+                                <span class="card-type">{{ listing.property_type }}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
-            {% else %}
-                <p>No listings available.</p>
             {% endif %}
+        {% else %}
+            <!-- Admin Dashboard -->
+            <div class="text-center">
+                <h2 class="mb-4">Admin Dashboard</h2>
+                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-primary btn-lg floating">
+                    <i class="fas fa-cog"></i> Manage System
+                </a>
+            </div>
+        {% endif %}
 
-            <!-- Display User Purchases -->
-            <h3>Your Purchases</h3>
-            {% if purchases %}
-                {% for purchase in purchases %}
-                <div class="listing-item">
-                    <a href="{{ url_for('purchase_detail', purchase_id=purchase.id) }}">
-                        <img src="{{ purchase.image_url }}" alt="Purchase Image">
-                        <h4>{{ purchase.title }}</h4>
-                        <p>Price: ₹{{ purchase.price }}</p>
-                        <p>Location: {{ purchase.location }}</p>
-                    </a>
-                </div>
-                {% endfor %}
-            {% else %}
-                <p>No purchases available.</p>
-            {% endif %}
-
-            <!-- Display User Sales -->
-            <h3>Your Sales</h3>
-            {% if sales %}
-                {% for sale in sales %}
-                <div class="listing-item">
-                    <a href="{{ url_for('sale_detail', sale_id=sale.id) }}">
-                        <img src="{{ sale.image_url }}" alt="Sale Image">
-                        <h4>{{ sale.title }}</h4>
-                        <p>Price: ₹{{ sale.price }}</p>
-                        <p>Location: {{ sale.location }}</p>
-                    </a>
-                </div>
-                {% endfor %}
-            {% else %}
-                <p>No sales available.</p>
-            {% endif %}
-        </div>
-    </div>
-
-    <div class="property-buttons">
-        <!-- Land button -->
-        <div class="property-card">
-            <img src="static/images/land.jpg" alt="Land Image">
-            <a href="{{ url_for('land') }}">
-                <button>Land</button>
+        <!-- Quick Actions -->
+        <div class="text-center mt-5">
+            <a href="{{ url_for('sell') }}" class="btn btn-success floating">
+                <i class="fas fa-plus"></i> Add New Listing
             </a>
-        </div>
-
-        <!-- House button -->
-        <div class="property-card">
-            <img src="/static/images/home.jpg" alt="House Image">
-            <a href="{{ url_for('house') }}">
-                <button>House</button>
-            </a>
-        </div>
-
-        <!-- Flat button -->
-        <div class="property-card">
-            <img src="/static/images/flat.jpg" alt="Flat Image">
-            <a href="{{ url_for('flat') }}">
-                <button>Flat</button>
+            <a href="{{ url_for('logout') }}" class="btn btn-danger floating">
+                <i class="fas fa-sign-out-alt"></i> Logout
             </a>
         </div>
     </div>
 
     <script>
-        // Function to toggle the modal
-        function toggleModal() {
-            const modal = document.getElementById('profileModal');
-            modal.style.display = modal.style.display === 'none' || modal.style.display === '' ? 'block' : 'none';
-        }
-
-        // Close the modal when the user clicks anywhere outside of it
-        window.onclick = function(event) {
-            const modal = document.getElementById('profileModal');
-            if (event.target === modal) {
-                modal.style.display = 'none';
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
             }
-        }
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
     </script>
 </body>
 </html>

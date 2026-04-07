@@ -1,197 +1,180 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Available Listings</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            color: #140f0f;
-            background-image: url('/static/images/bgimage.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        h1 {
-            color: #fff;
-            text-align: center;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
-        }
-        ul {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Responsive grid */
-            gap: 10px; /* Space between items */
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-            width: 100%; /* Full width */
-            max-width: 1200px; /* Limit max width */
-        }
-        li {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 15px;
-            border-radius: 5px;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        li:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-        }
-        img {
-            width: 100%; /* Set the image width to 100% of its container */
-            height: auto; /* Maintain aspect ratio */
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
-        .price {
-            font-weight: bold;
-            color: #007bff;
-        }
-        .location {
-            font-style: italic;
-            color: #666;
-        }
-        a {
-            display: inline-block;
-            margin-top: 20px;
-            text-decoration: none;
-            color: #007bff;
-            font-weight: bold;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        form {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-            width: 100%;
-        }
-        input {
-            padding: 10px;
-            margin: 0 5px;
-            border-radius: 5px;
-            border: none;
-            width: 200px;
-        }
-        #contrastBox {
-            width: 80%;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: rgba(0, 0, 0, 0.7);
-            color: #fff;
-            border-radius: 10px;
-            text-align: center;
-            font-size: 1.5em;
-            display: none;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-            transition: opacity 0.5s ease, transform 0.5s ease;
-        }
-        #contrastBox.show {
-            display: block;
-            opacity: 1;
-            transform: translateY(0);
-        }
-        #contrastBox.hide {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-        #noResults {
-            display: none;
-            color: #ff0000;
-            margin-top: 20px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Available Listings - Real Estate</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <h1>Available Listings</h1>
+  <!-- Video Background -->
+  <div class="video-background">
+    <video autoplay muted loop>
+      <source src="https://player.vimeo.com/external/434045526.sd.mp4?s=c27eecc69a27dbc4ff2b87d38afc35f1a9e7c02d&profile_id=164&oauth2_token_id=57447761" type="video/mp4">
+    </video>
+    <div class="video-overlay"></div>
+  </div>
 
-    <form>
-        <input type="text" id="searchInput" placeholder="Search properties...">
-    </form>
+  <header class="glass">
+    <div class="container">
+      <h1 class="floating">Available Real Estate Listings</h1>
+      <p>Find your perfect property from our curated collection</p>
+    </div>
+  </header>
 
-    <div id="contrastBox">You searched for: <span id="userQuery"></span></div>
-    <div id="noResults">No listings found.</div>
+  <div class="container">
+    <div class="filters glass">
+      <div class="filters-grid">
+        <input type="text" id="searchInput" class="form-control" placeholder="Search by title, location, description...">
+        <select id="filterType" class="form-control">
+          <option value="">All Types</option>
+          <option value="Land">Land</option>
+          <option value="House">House</option>
+          <option value="Flat">Flat</option>
+        </select>
+        <select id="sortPrice" class="form-control">
+          <option value="">Sort By Price</option>
+          <option value="low">Price: Low to High</option>
+          <option value="high">Price: High to Low</option>
+        </select>
+      </div>
+    </div>
 
-    <ul id="listingContainer">
-        {% for listing in listings %}
-            <li class="listing-item" data-image-url="{{ listing.image_url }}">
-                <img src="{{ listing.image_url }}" alt="Image of {{ listing.title }}">
-                <h3 class="title">Title: {{ listing.title }}</h3>
-                <p>{{ listing.description }}</p>
-                <p class="price">Price: {{ listing.price }}</p>
-                <p class="location">Location: {{ listing.location }}</p>
-            </li>
-        {% endfor %}
-    </ul>
+    <div id="contrastBox" class="text-center mb-3" style="display: none;">
+      <span class="card-type floating">You searched for: <span id="userQuery"></span></span>
+    </div>
+    <div id="noResults" class="text-center mb-3" style="display: none;">
+      <div class="flash flash-error">No listings found matching your criteria.</div>
+    </div>
 
-    <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+    <div class="grid grid-cols-3" id="listingContainer">
+      {% for listing in listings %}
+        <div class="card listing-item floating"
+             data-title="{{ listing.title }}"
+             data-description="{{ listing.description }}"
+             data-price="{{ listing.price }}"
+             data-location="{{ listing.location }}"
+             data-type="{{ listing.property_type }}"
+             data-image-url="{{ listing.image_url }}">
+          <img src="{{ listing.image_url }}" alt="{{ listing.title }}" class="card-img">
+          <div class="card-body">
+            <h3 class="card-title">{{ listing.title }}</h3>
+            <p class="card-text">{{ listing.description[:100] }}{% if listing.description|length > 100 %}...{% endif %}</p>
+            <p class="card-price">₹{{ "{:,.0f}".format(listing.price) }}</p>
+            <p class="card-location"><i class="fas fa-map-marker-alt"></i> {{ listing.location }}</p>
+            <span class="card-type">{{ listing.property_type }}</span>
+            
+            <!-- Contact Information -->
+            {% if listing.contact_phone or listing.contact_email %}
+              <div class="contact-info mt-3">
+                {% if listing.contact_phone %}
+                  <div class="contact-item">
+                    <i class="fas fa-phone"></i>
+                    <span>{{ listing.contact_phone }}</span>
+                  </div>
+                {% endif %}
+                {% if listing.contact_email %}
+                  <div class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>{{ listing.contact_email }}</span>
+                  </div>
+                {% endif %}
+                {% if listing.contact_address %}
+                  <div class="contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>{{ listing.contact_address[:50] }}{% if listing.contact_address|length > 50 %}...{% endif %}</span>
+                  </div>
+                {% endif %}
+              </div>
+            {% endif %}
+            
+            <div class="mt-3">
+              <a href="{{ url_for('buy_property_payment', listing_id=listing._id) }}" class="btn btn-success btn-sm floating">
+                <i class="fas fa-shopping-cart"></i> Buy Now
+              </a>
+              <a href="{{ url_for('contact_owner', listing_id=listing._id) }}" class="btn btn-primary btn-sm floating">
+                <i class="fas fa-phone"></i> Contact Owner
+              </a>
+              <a href="{{ url_for('view_listing_details', listing_id=listing._id) }}" class="btn btn-secondary btn-sm floating">
+                <i class="fas fa-eye"></i> View Details
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
 
-    <script>
-        const searchInput = document.getElementById('searchInput');
-        const listingContainer = document.getElementById('listingContainer');
-        const listings = document.querySelectorAll('.listing-item');
-        const contrastBox = document.getElementById('contrastBox');
-        const userQuery = document.getElementById('userQuery');
-        const noResults = document.getElementById('noResults');
+    <div class="text-center mt-5">
+      <a href="{{ url_for('dashboard') }}" class="btn btn-secondary floating">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+      </a>
+    </div>
+  </div>
 
-        function isImageSizeValid(imageUrl, minWidth, minHeight) {
-            return new Promise((resolve) => {
-                const img = new Image();
-                img.src = imageUrl;
-                img.onload = () => {
-                    resolve(img.width >= minWidth && img.height >= minHeight);
-                };
-                img.onerror = () => {
-                    resolve(false);
-                };
-            });
-        }
+  <script>
+    const searchInput = document.getElementById('searchInput');
+    const filterType = document.getElementById('filterType');
+    const sortPrice = document.getElementById('sortPrice');
+    const listingContainer = document.getElementById('listingContainer');
+    const listings = Array.from(document.querySelectorAll('.listing-item'));
+    const contrastBox = document.getElementById('contrastBox');
+    const userQuery = document.getElementById('userQuery');
+    const noResults = document.getElementById('noResults');
 
-        async function filterListings() {
-            const query = searchInput.value.toLowerCase();
-            userQuery.textContent = query;
+    async function isImageSizeValid(url, minWidth, minHeight) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.src = url;
+        img.onload = () => resolve(img.width >= minWidth && img.height >= minHeight);
+        img.onerror = () => resolve(false);
+      });
+    }
 
-            if (query) {
-                contrastBox.classList.add('show');
-            } else {
-                contrastBox.classList.remove('show');
-            }
+    async function filterAndSortListings() {
+      const query = searchInput.value.toLowerCase();
+      const type = filterType.value;
+      const sort = sortPrice.value;
 
-            let hasResults = false;
+      userQuery.textContent = query;
+      contrastBox.style.display = query ? 'block' : 'none';
 
-            for (const listing of listings) {
-                const title = listing.querySelector('h3').textContent.toLowerCase();
-                const description = listing.querySelector('p').textContent.toLowerCase();
-                const price = listing.querySelector('.price').textContent.toLowerCase();
-                const location = listing.querySelector('.location').textContent.toLowerCase();
-                const imageUrl = listing.getAttribute('data-image-url');
+      let filtered = await Promise.all(listings.map(async (listing) => {
+        const title = listing.dataset.title.toLowerCase();
+        const description = listing.dataset.description.toLowerCase();
+        const price = parseFloat(listing.dataset.price);
+        const location = listing.dataset.location.toLowerCase();
+        const propertyType = listing.dataset.type;
+        const imageUrl = listing.dataset.imageUrl;
 
-                const isValidSize = await isImageSizeValid(imageUrl, 800, 600);
+        const matchesQuery = [title, description, location].some(text => text.includes(query));
+        const matchesType = !type || propertyType === type;
+        const isValidSize = await isImageSizeValid(imageUrl, 800, 600);
 
-                if (isValidSize && (title.includes(query) || description.includes(query) || price.includes(query) || location.includes(query))) {
-                    listing.style.display = '';
-                    hasResults = true; // Set flag if there are matching results
-                } else {
-                    listing.style.display = 'none';
-                }
-            }
+        const isVisible = matchesQuery && matchesType && isValidSize;
+        listing.style.display = isVisible ? '' : 'none';
+        return isVisible ? { node: listing, price } : null;
+      }));
 
-            noResults.style.display = hasResults ? 'none' : 'block'; // Show or hide no results message
-        }
+      filtered = filtered.filter(item => item);
 
-        let timeout;
-        searchInput.addEventListener('input', function() {
-            clearTimeout(timeout);
-            timeout = setTimeout(filterListings, 300);
-        });
-    </script>
+      if (sort === 'low') filtered.sort((a, b) => a.price - b.price);
+      else if (sort === 'high') filtered.sort((a, b) => b.price - a.price);
+
+      filtered.forEach(({ node }) => listingContainer.appendChild(node));
+      noResults.style.display = filtered.length ? 'none' : 'block';
+    }
+
+    [searchInput, filterType, sortPrice].forEach(el => {
+      el.addEventListener('input', () => setTimeout(filterAndSortListings, 200));
+    });
+
+    // Add staggered animation to cards
+    const cards = document.querySelectorAll('.card');
+    cards.forEach((card, index) => {
+      card.style.animationDelay = `${index * 0.1}s`;
+    });
+  </script>
 </body>
 </html>

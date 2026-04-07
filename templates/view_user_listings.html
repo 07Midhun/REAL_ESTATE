@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ user.username }}'s Listings - Real Estate</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Video Background -->
+    <div class="video-background">
+        <video autoplay muted loop>
+            <source src="https://player.vimeo.com/external/434045526.sd.mp4?s=c27eecc69a27dbc4ff2b87d38afc35f1a9e7c02d&profile_id=164&oauth2_token_id=57447761" type="video/mp4">
+        </video>
+        <div class="video-overlay"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="glass">
+        <div class="container">
+            <h1 class="floating">
+                <i class="fas fa-user-circle"></i> {{ user.username }}'s Listings
+            </h1>
+            <p>View all properties listed by this user</p>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="navbar glass">
+        <div class="container">
+            <a href="{{ url_for('dashboard') }}" class="navbar-brand">
+                <i class="fas fa-home"></i> Real Estate
+            </a>
+            <ul class="navbar-nav">
+                <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('admin_dashboard') }}">Admin Panel</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- User Info Card -->
+        <div class="card glass mb-4">
+            <div class="card-body">
+                <div class="grid grid-cols-2">
+                    <div>
+                        <h3 class="card-title">
+                            <i class="fas fa-user"></i> User Information
+                        </h3>
+                        <p><strong>Username:</strong> {{ user.username }}</p>
+                        <p><strong>Email:</strong> {{ user.email or 'N/A' }}</p>
+                        <p><strong>Phone:</strong> {{ user.phone or 'N/A' }}</p>
+                        <p><strong>Address:</strong> {{ user.address or 'N/A' }}</p>
+                        <p><strong>Role:</strong> 
+                            {% if user.is_admin %}
+                                <span class="badge admin-badge">
+                                    <i class="fas fa-crown"></i> Administrator
+                                </span>
+                            {% else %}
+                                <span class="badge user-badge">
+                                    <i class="fas fa-user"></i> User
+                                </span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="text-center">
+                        <div class="floating" style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto;">
+                            {{ user.username[0]|upper }}
+                        </div>
+                        <p class="mt-2">{{ user.username }}</p>
+                        <p class="text-muted">{{ listings|length }} Properties</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Listings Section -->
+        {% if listings %}
+            <h2 class="text-center mb-4 floating">
+                <i class="fas fa-home"></i> Property Listings ({{ listings|length }})
+            </h2>
+            
+            <div class="grid grid-cols-3">
+                {% for listing in listings %}
+                    <div class="card floating">
+                        <img src="{{ listing.image_url }}" alt="{{ listing.title }}" class="card-img">
+                        <div class="card-body">
+                            <h3 class="card-title">{{ listing.title }}</h3>
+                            <p class="card-text">{{ listing.description[:100] }}{% if listing.description|length > 100 %}...{% endif %}</p>
+                            <p class="card-price">₹{{ "{:,.0f}".format(listing.price) }}</p>
+                            <p class="card-location"><i class="fas fa-map-marker-alt"></i> {{ listing.location }}</p>
+                            <span class="card-type">{{ listing.property_type }}</span>
+                            
+                            <!-- Contact Information -->
+                            {% if listing.contact_phone or listing.contact_email %}
+                                <div class="contact-info mt-3">
+                                    {% if listing.contact_phone %}
+                                        <div class="contact-item">
+                                            <i class="fas fa-phone"></i>
+                                            <span>{{ listing.contact_phone }}</span>
+                                        </div>
+                                    {% endif %}
+                                    {% if listing.contact_email %}
+                                        <div class="contact-item">
+                                            <i class="fas fa-envelope"></i>
+                                            <span>{{ listing.contact_email }}</span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                            
+                            <div class="mt-3">
+                                <a href="{{ url_for('buy_property_payment', listing_id=listing._id) }}" class="btn btn-success btn-sm floating">
+                                    <i class="fas fa-shopping-cart"></i> Buy Now
+                                </a>
+                                <a href="{{ url_for('contact_owner', listing_id=listing._id) }}" class="btn btn-primary btn-sm floating">
+                                    <i class="fas fa-phone"></i> Contact
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="card glass text-center">
+                <div class="card-body">
+                    <i class="fas fa-home" style="font-size: 4rem; color: #667eea; margin-bottom: 1rem;"></i>
+                    <h3 class="card-title">No Listings Found</h3>
+                    <p class="card-text">This user hasn't listed any properties yet.</p>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Action Buttons -->
+        <div class="text-center mt-5">
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary floating">
+                <i class="fas fa-arrow-left"></i> Back to Admin Dashboard
+            </a>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-primary floating">
+                <i class="fas fa-home"></i> Go to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <style>
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .admin-badge {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: white;
+        }
+
+        .user-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+    </style>
+
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Add staggered animation to cards
+        const cards = document.querySelectorAll('.card');
+        cards.forEach((card, index) => {
+            card.style.animationDelay = `${index * 0.1}s`;
+        });
+    </script>
+</body>
+</html>

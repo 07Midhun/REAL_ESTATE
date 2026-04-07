@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Real Estate</title>
+    <title>Edit Profile - Real Estate</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -19,41 +19,59 @@
 
     <div class="container">
         <div class="form-container glass">
-            <h1 class="text-center mb-4 floating">Welcome Back</h1>
+            <h1 class="text-center mb-4 floating">
+                <i class="fas fa-user-edit"></i> Edit Profile
+            </h1>
             
             {% with messages = get_flashed_messages() %}
                 {% if messages %}
                     {% for message in messages %}
-                        <div class="flash flash-error">{{ message }}</div>
+                        <div class="flash flash-success">{{ message }}</div>
                     {% endfor %}
                 {% endif %}
             {% endwith %}
             
             <form method="POST">
                 <div class="form-group">
-                    <label for="email" class="form-label">
-                        <i class="fas fa-envelope"></i> Email
+                    <label for="username" class="form-label">
+                        <i class="fas fa-user"></i> Username
                     </label>
-                    <input type="email" id="email" name="email" class="form-control" required>
+                    <input type="text" id="username" value="{{ user.username }}" class="form-control" disabled>
+                    <small class="text-muted">Username cannot be changed</small>
                 </div>
                 
                 <div class="form-group">
-                    <label for="password" class="form-label">
-                        <i class="fas fa-lock"></i> Password
+                    <label for="email" class="form-label">
+                        <i class="fas fa-envelope"></i> Email
                     </label>
-                    <input type="password" id="password" name="password" class="form-control" required>
+                    <input type="email" id="email" name="email" value="{{ user.email or '' }}" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone" class="form-label">
+                        <i class="fas fa-phone"></i> Phone Number
+                    </label>
+                    <input type="tel" id="phone" name="phone" value="{{ user.phone or '' }}" class="form-control" placeholder="+91 98765 43210">
+                </div>
+                
+                <div class="form-group">
+                    <label for="address" class="form-label">
+                        <i class="fas fa-map-marker-alt"></i> Address
+                    </label>
+                    <textarea id="address" name="address" class="form-control" placeholder="Enter your full address">{{ user.address or '' }}</textarea>
                 </div>
                 
                 <button type="submit" class="btn btn-primary floating" style="width: 100%;">
-                    <i class="fas fa-sign-in-alt"></i> Login
+                    <i class="fas fa-save"></i> Update Profile
                 </button>
             </form>
             
             <div class="text-center mt-3">
-                <p>Don't have an account? <a href="{{ url_for('signup') }}" class="floating">Sign up here</a></p>
-                <p><a href="{{ url_for('forgot_password') }}" class="floating">Forgot your password?</a></p>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-secondary floating">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
             </div>
         </div>
     </div>
 </body>
-</html>
+</html> 
