@@ -4,6 +4,7 @@ from werkzeug.utils import secure_filename
 from bson.objectid import ObjectId
 from datetime import datetime
 import os
+import re
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
@@ -17,12 +18,37 @@ reviews_collection = db['reviews']
 
 # --- Helper Functions ---
 def get_user_by_username(username):
-    return users_collection.find_one({"username": username})
+    if not username or not str(username).strip():
+        return None
+    return users_collection.find_one({"username": str(username).strip()})
 
 def get_user_by_email(email):
-    return users_collection.find_one({"email": email})
+    if not email or not str(email).strip():
+        return None
+    e = str(email).strip()
+    # Normalized emails are stored lowercase; try exact match first (indexed).
+    user = users_collection.find_one({"email": e.lower()})
+    if user:
+        return user
+    # Case-insensitive full-string match (use re.compile — dict $regex/$options can fail to match).
+    pattern = re.compile("^" + re.escape(e) + "$", re.IGNORECASE)
+    return users_collection.find_one({"email": pattern})
+
+def get_user_for_login(identifier):
+    """Resolve user by email (case-insensitive) or by username."""
+    if not identifier or not str(identifier).strip():
+        return None
+    ident = str(identifier).strip()
+    user = get_user_by_email(ident)
+    if user:
+        return user
+    return get_user_by_username(ident)
 
 def add_user(username, email, password, phone=None, address=None):
+    username = str(username).strip()
+    email = str(email).strip().lower()
+    if not username or not email:
+        return "Username and email are required."
     if get_user_by_username(username):
         return "Username already exists."
     if get_user_by_email(email):
@@ -45,10 +71,10 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-        user = get_user_by_email(email)
-        if user and user['password'] == password:
+        identifier = request.form.get('login', '').strip() or request.form.get('email', '').strip()
+        password = request.form.get('password', '')
+        user = get_user_for_login(identifier)
+        if user and user.get('password') == password:
             session['username'] = user['username']
             return redirect(url_for('dashboard'))
         flash('Invalid credentials.')
@@ -66,18 +92,36 @@ def signup():
         if result != "Success":
             flash(result)
             return redirect(url_for('signup'))
-        session['username'] = username
+        session['username'] = str(username).strip()
         return redirect(url_for('dashboard'))
     return render_template('signup.html')
 
 @app.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
     if request.method == 'POST':
-        email = request.form['email']
-        if get_user_by_email(email):
-            flash('Password reset link sent to your email.')
-        else:
+        email = request.form.get('email', '')
+        new_password = request.form.get('new_password', '')
+        confirm_password = request.form.get('confirm_password', '')
+
+        user = get_user_by_email(email)
+        if not user:
             flash('Email not found.')
+            return render_template('forgot_password.html')
+
+        if not new_password:
+            flash('Please enter a new password.')
+            return render_template('forgot_password.html')
+
+        if new_password != confirm_password:
+            flash('Passwords do not match.')
+            return render_template('forgot_password.html')
+
+        users_collection.update_one(
+            {'_id': user['_id']},
+            {'$set': {'password': new_password}}
+        )
+        flash('Password updated. Please log in.')
+        return redirect(url_for('login'))
     return render_template('forgot_password.html')
 
 @app.route('/dashboard')
